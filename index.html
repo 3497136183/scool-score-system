@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高校学生日常表现量化积分管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+        body { background-color: #f5f7fa; color: #333; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background-color: #2c3e50; color: white; padding: 20px 0; text-align: center; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        .subtitle { font-size: 16px; opacity: 0.8; }
+        .login-section, .management-section { background-color: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h2 { color: #2c3e50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1; }
+        h3 { margin-top: 20px; margin-bottom: 10px; color: #2c3e50; }
+        h4 { margin-top: 15px; margin-bottom: 10px; color: #34495e; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #34495e; }
+        input, select, button, textarea { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 2px rgba(52,152,219,0.2); }
+        button { background-color: #3498db; color: white; border: none; cursor: pointer; font-weight: 600; transition: background-color 0.3s; }
+        button:hover { background-color: #2980b9; }
+        .logout-btn { background-color: #e74c3c; width: auto; padding: 10px 20px; margin-top: 20px; }
+        .logout-btn:hover { background-color: #c0392b; }
+        .page-selector { display: flex; justify-content: center; margin-bottom: 30px; }
+        .page-btn { padding: 12px 30px; margin: 0 10px; background-color: #ecf0f1; color: #7f8c8d; border: 2px solid #bdc3c7; border-radius: 4px; font-weight: 600; cursor: pointer; transition: all 0.3s; width: auto; }
+        .page-btn.active { background-color: #3498db; color: white; border-color: #3498db; }
+        .page-btn:hover:not(.active) { background-color: #d5dbdb; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .student-info { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; background-color: #f8f9fa; padding: 15px; border-radius: 6px; }
+        .info-item { flex: 1; min-width: 200px; }
+        .score-summary { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .summary-card { background-color: white; border-radius: 6px; padding: 20px; text-align: center; flex: 1; margin: 0 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-top: 4px solid #3498db; }
+        .summary-card h3 { font-size: 14px; color: #7f8c8d; margin-bottom: 10px; }
+        .summary-card .score { font-size: 32px; font-weight: 700; color: #2c3e50; }
+        .score-table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 6px; overflow: hidden; }
+        .score-table th, .score-table td { border: 1px solid #ecf0f1; padding: 15px; text-align: center; }
+        .score-table th { background-color: #2c3e50; color: white; font-weight: 600; }
+        .score-table tr:nth-child(even) { background-color: #f8f9fa; }
+        .positive-score { color: #27ae60; font-weight: 600; }
+        .negative-score { color: #e74c3c; font-weight: 600; }
+        .history-section { margin-top: 30px; }
+        .history-controls { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .history-controls input, .history-controls select { flex: 1; min-width: 160px; }
+        .history-controls button { width: auto; min-width: 100px; }
+        .history-table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 6px; overflow: hidden; margin-top:10px; }
+        .history-table th, .history-table td { border: 1px solid #ecf0f1; padding: 12px; text-align: center; }
+        .history-table th { background-color: #34495e; color: white; }
+        .history-table tr:nth-child(even) { background-color: #f8f9fa; }
+        .school-management { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+        .class-list { background-color: white; border-radius: 6px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-height: 500px; overflow-y: auto; }
+        .class-item { padding: 12px 15px; border-bottom: 1px solid #ecf0f1; cursor: pointer; transition: background-color 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .class-item:hover { background-color: #f8f9fa; }
+        .class-item.active { background-color: #e3f2fd; border-left: 4px solid #3498db; }
+        .del-class-btn { background: #e74c3c; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+        .del-class-btn:hover { background: #c0392b; }
+        .student-editor { background-color: white; border-radius: 6px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .form-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .form-field { flex: 1; min-width: 200px; }
+        .action-buttons { display: flex; gap: 15px; margin-top: 30px; flex-wrap:wrap; }
+        .save-btn { background-color: #27ae60; }
+        .save-btn:hover { background-color: #219653; }
+        .delete-btn { background-color: #e74c3c; }
+        .delete-btn:hover { background-color: #c0392b; }
+        .add-btn { background-color: #9b59b6; margin-bottom: 15px; }
+        .add-btn:hover { background-color: #8e44ad; }
+        .batch-add-btn { background-color: #f39c12; margin-bottom: 15px; }
+        .batch-add-btn:hover { background-color: #d35400; }
+        .batch-delete-btn { background-color: #c0392b; margin-bottom: 15px; }
+        .identity-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
+        .identity-student { background-color: #3498db; }
+        .identity-monitor { background-color: #2ecc71; }
+        .identity-instructor { background-color: #9b59b6; }
+        .identity-battalion-chief { background-color: #e67e22; }
+        .identity-deputy-instructor { background-color: #1abc9c; }
+        .identity-deputy-battalion-chief { background-color: #d35400; }
+        .identity-company-commander { background-color: #e74c3c; }
+        .identity-guidance-instructor { background-color: #34495e; }
+        .identity-admin { background-color: #8e44ad; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 6px; color: white; font-weight: 600; z-index: 1000; opacity: 0; transform: translateX(100%); transition: all 0.3s; }
+        .notification.show { opacity: 1; transform: translateX(0); }
+        .notification.success { background-color: #27ae60; }
+        .notification.error { background-color: #e74c3c; }
+        .notification.info { background-color: #3498db; }
+        .hidden { display: none; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal.show { opacity: 1; visibility: visible; }
+        .modal-content { background-color: white; border-radius: 8px; padding: 25px; width: 90%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ecf0f1; }
+        .modal-title { font-size: 20px; color: #2c3e50; }
+        .close-modal { background: none; border: none; font-size: 24px; color: #7f8c8d; cursor: pointer; width: auto; padding: 0; }
+        .close-modal:hover { color: #e74c3c; }
+        .admin-notice { background: #e3f2fd; color: #1976d2; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #1976d2; }
+        .online-students { margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px; }
+        .online-students ul { list-style: none; padding-left: 0; }
+        .online-students li { padding: 4px 0; color: #27ae60; }
+        .admin-score-preview { margin-top: 25px; padding-top: 20px; border-top: 2px solid #ecf0f1; }
+        .today-total { font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+        .sync-status { position: fixed; bottom: 20px; right: 20px; background: #3498db; color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; z-index: 1000; }
+        .sync-status.offline { background: #e74c3c; }
+        .sync-status.syncing { background: #f39c12; }
+        .data-status { position: fixed; bottom: 20px; left: 20px; background: #2c3e50; color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; z-index: 1000; }
+        @media (max-width: 768px) { .school-management { grid-template-columns: 1fr; } .score-summary { flex-direction: column; } .summary-card { margin: 10px 0; } .action-buttons { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>高校学生日常表现量化积分管理系统</h1>
+        <p class="subtitle">云端多人协作 · 数据实时同步 · 基础分自动加满（值班=0）</p>
+    </header>
+
+    <div class="page-selector">
+        <button id="studentPageBtn" class="page-btn active">学生查询页面</button>
+        <button id="schoolPageBtn" class="page-btn">学校管理页面</button>
+    </div>
+
+    <!-- 学生查询页面 -->
+    <div id="studentPage" class="page active">
+        <div class="login-section">
+            <h2>学生分数查询</h2>
+            <div class="form-group">
+                <label for="studentClass">① 选择你的班级</label>
+                <select id="studentClass" style="font-size:17px; font-weight:500;">
+                    <option value="">-- 点此选择班级 --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="studentId">② 输入你的学号</label>
+                <input type="text" id="studentId" placeholder="请输入你的学号" style="font-size:17px;">
+            </div>
+            <button id="studentLoginBtn" style="font-size:18px; padding:14px;">③ 点击查询分数</button>
+        </div>
+
+        <div id="studentInfoSection" class="management-section hidden">
+            <div id="adminActionNotice" class="admin-notice hidden">管理员刚刚更新了你的数据</div>
+            <h2>我的信息</h2>
+            <div class="student-info">
+                <div class="info-item"><label>姓名</label><div id="displayName">--</div></div>
+                <div class="info-item"><label>学号</label><div id="displayStudentId">--</div></div>
+                <div class="info-item"><label>班级</label><div id="displayClass">--</div></div>
+                <div class="info-item"><label>身份</label><div id="displayIdentity">--</div></div>
+            </div>
+
+            <div class="score-summary">
+                <div class="summary-card"><h3>今日总分</h3><div class="score" id="todayTotal">0</div></div>
+                <div class="summary-card"><h3>本月总分</h3><div class="score" id="monthlyTotal">0</div></div>
+                <div class="summary-card"><h3>累计总分</h3><div class="score" id="totalScore">0</div></div>
+            </div>
+
+            <h3>当日量化积分明细</h3>
+            <table class="score-table" id="studentScoreTable">
+                <thead id="studentScoreHeader"></thead>
+                <tbody id="studentScoreBody"></tbody>
+            </table>
+
+            <!-- 历史每日明细 -->
+            <div class="history-section">
+                <h3>历史每日明细查询</h3>
+                <div class="history-controls">
+                    <input type="date" id="historyDateInput">
+                    <button id="queryHistoryBtn">查询当日明细</button>
+                </div>
+                <table class="history-table" id="historyDetailTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- 历史每月总分查询 -->
+            <div class="history-section">
+                <h3>历史每月总分查询</h3>
+                <div class="history-controls">
+                    <select id="historyMonthSelect">
+                        <option value="">-- 选择月份 --</option>
+                    </select>
+                    <button id="queryMonthTotalBtn">查询当月总分</button>
+                </div>
+                <table class="history-table" id="monthTotalTable">
+                    <thead><tr><th>月份</th><th>当月总分</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <button class="logout-btn" id="studentLogoutBtn">退出登录</button>
+        </div>
+    </div>
+
+    <!-- 学校管理页面 -->
+    <div id="schoolPage" class="page">
+        <div class="login-section">
+            <h2>学校管理员登录</h2>
+            <div class="form-group">
+                <label for="adminUsername">用户名</label>
+                <input type="text" id="adminUsername" placeholder="请输入管理员用户名">
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">密码</label>
+                <input type="password" id="adminPassword" placeholder="请输入管理员密码">
+            </div>
+            <button id="adminLoginBtn">管理员登录</button>
+        </div>
+
+        <div id="schoolManagementSection" class="management-section hidden">
+            <h2>学校管理面板</h2>
+            <div class="school-management">
+                <div class="class-list">
+                    <h3>班级列表</h3>
+                    <button class="add-btn" id="addClassBtn">+ 添加新班级</button>
+                    <button class="batch-add-btn" id="batchAddClassBtn">+ 批量导入班级</button>
+                    <div id="classListContainer"></div>
+                </div>
+
+                <div class="student-editor">
+                    <h3>学生/用户管理</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="editClass">班级</label>
+                            <select id="editClass"><option value="">-- 请选择班级 --</option></select>
+                        </div>
+                        <div class="form-field">
+                            <label for="editStudentId">学号/工号</label>
+                            <input type="text" id="editStudentId" placeholder="输入学号或工号">
+                        </div>
+                        <div class="form-field">
+                            <label for="editName">姓名</label>
+                            <input type="text" id="editName" placeholder="输入姓名">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="editIdentity">身份</label>
+                            <select id="editIdentity">
+                                <option value="学生">学生</option>
+                                <option value="班长">班长</option>
+                                <option value="连长">连长</option>
+                                <option value="指导员">指导员</option>
+                                <option value="副营长">副营长</option>
+                                <option value="营长">营长</option>
+                                <option value="副教导员">副教导员</option>
+                                <option value="教导员">教导员</option>
+                                <option value="管理员">管理员</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h4>基础加分项（值班=0，不自动加分）</h4>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editMorningExercise">早操(10)</label><input type="number" id="editMorningExercise" min="0" max="10" value="0"></div>
+                        <div class="form-field"><label for="editClassAttendance">上课(10)</label><input type="number" id="editClassAttendance" min="0" max="10" value="0"></div>
+                        <div class="form-field"><label for="editTraining">实训(10)</label><input type="number" id="editTraining" min="0" max="10" value="0"></div>
+                        <div class="form-field"><label for="editPhysicalTraining">体能训练(10)</label><input type="number" id="editPhysicalTraining" min="0" max="10" value="0"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editRollCall">点名(10)</label><input type="number" id="editRollCall" min="0" max="10" value="0"></div>
+                        <div class="form-field"><label for="editDuty">值班(10)</label><input type="number" id="editDuty" min="0" max="10" value="0"></div>
+                    </div>
+
+                    <h4>奖励加分项</h4>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editSchoolAward">校内奖(10)</label><input type="number" id="editSchoolAward" min="0" max="10" value="0"></div>
+                        <div class="form-field"><label for="editProvincialAward">省级奖(20)</label><input type="number" id="editProvincialAward" min="0" max="20" value="0"></div>
+                        <div class="form-field"><label for="editStarAward">国级奖(40)</label><input type="number" id="editStarAward" min="0" max="40" value="0"></div>
+                        <div class="form-field"><label for="editAdminBonus">管理员加分(50)</label><input type="number" id="editAdminBonus" min="0" max="50" value="0"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editVolunteer">志愿者(10)</label><input type="number" id="editVolunteer" min="0" max="10" value="0"></div>
+                        <div class="form-field"><label for="editGoodDeed">好人好事(10)</label><input type="number" id="editGoodDeed" min="0" max="10" value="0"></div>
+                    </div>
+
+                    <h4>扣分项</h4>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editUniformViolation">军容不整(30)</label><input type="number" id="editUniformViolation" min="0" max="30" value="0"></div>
+                        <div class="form-field"><label for="editPhoneViolation">违规使用手机(50)</label><input type="number" id="editPhoneViolation" min="0" max="50" value="0"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editComputerViolation">违规使用电脑(50)</label><input type="number" id="editComputerViolation" min="0" max="50" value="0"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editSmokingViolation">违规抽烟(25)</label><input type="number" id="editSmokingViolation" min="0" max="25" value="0"></div>
+                        <div class="form-field"><label for="editNightAbsence">夜不归宿(25)</label><input type="number" id="editNightAbsence" min="0" max="25" value="0"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field"><label for="editLateRise">未及时起床(25)</label><input type="number" id="editLateRise" min="0" max="25" value="0"></div>
+                        <div class="form-field"><label for="editUntimelyLeave">未及时请假销假(25)</label><input type="number" id="editUntimelyLeave" min="0" max="25" value="0"></div>
+                    </div>
+
+                    <div class="admin-score-preview">
+                        <h4>📊 该生当日分数实时预览</h4>
+                        <div class="today-total">当日总分：<span id="adminTodayTotal" class="positive-score">0</span></div>
+                        <table class="score-table" id="adminScorePreviewTable">
+                            <thead>
+                                <tr>
+                                    <th>评分项目</th>
+                                    <th>当前分数</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminScorePreviewBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="save-btn" id="saveStudentBtn">保存用户信息</button>
+                        <button class="delete-btn" id="deleteStudentBtn">删除该用户</button>
+                        <button class="add-btn" id="addStudentBtn">添加新用户</button>
+                        <button class="batch-delete-btn" id="batchDeleteStudentsBtn">批量删除该班用户</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="online-students">
+                <h3>当前在线学生</h3>
+                <ul id="onlineStudentsList"></ul>
+            </div>
+
+            <button class="logout-btn" id="adminLogoutBtn">退出管理员登录</button>
+        </div>
+    </div>
+
+    <!-- 批量导入班级模态框 -->
+    <div id="batchAddModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">批量导入班级</h3>
+                <button class="close-modal" id="closeBatchModal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="batchClassNames">班级名称（每行一个班级）</label>
+                <textarea id="batchClassNames" rows="8" placeholder="计算机1班&#10;软件2班"></textarea>
+            </div>
+            <div class="action-buttons">
+                <button class="save-btn" id="confirmBatchAdd">确认导入</button>
+                <button class="delete-btn" id="cancelBatchAdd">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    <div id="syncStatus" class="sync-status">已连接云端</div>
+    <div id="dataStatus" class="data-status">数据已同步</div>
+</div>
+
+<script>
+    // 配置常量
+    // 重要：部署到Vercel后，将这里的URL替换为你的实际Vercel域名
+    const API_BASE_URL = '/api';    
+    const STORAGE_KEY = 'school_data_v3';
+    const LAST_RUN_DATE = 'lastAutoDate';
+    const SYNC_INTERVAL = 30000; // 30秒同步一次
+    const MAX_RETRY = 3; // 最大重试次数
+
+    let schoolData = { classes: [] };
+    let currentState = {
+        studentLoggedIn: false, 
+        currentStudent: null, 
+        currentStudentClass: null,
+        adminLoggedIn: false, 
+        currentClassId: null
+    };
+
+    let onlineStudents = [];
+    let syncTimer = null;
+    let isOnline = true;
+    let retryCount = 0;
+    let lastSyncTime = null;
+
+    const IDENTITY_TYPES = {
+        '学生':'identity-student',
+        '班长':'identity-monitor',
+        '连长':'identity-company-commander',
+        '指导员':'identity-guidance-instructor',
+        '副营长':'identity-deputy-battalion-chief',
+        '营长':'identity-battalion-chief',
+        '副教导员':'identity-deputy-instructor',
+        '教导员':'identity-instructor',
+        '管理员':'identity-admin'
+    };
+
+    const AUTO_BASE = {
+        morningExercise: 10,
+        classAttendance: 10,
+        training: 10,
+        physicalTraining: 10,
+        rollCall: 10,
+        duty: 0
+    };
+
+    const SCORE_FIELDS = [
+        {key:'morningExercise',label:'早操'},
+        {key:'classAttendance',label:'上课'},
+        {key:'training',label:'实训'},
+        {key:'physicalTraining',label:'体能训练'},
+        {key:'rollCall',label:'点名'},
+        {key:'duty',label:'值班'},
+        {key:'schoolAward',label:'校内奖'},
+        {key:'provincialAward',label:'省级奖'},
+        {key:'starAward',label:'国级奖'},
+        {key:'adminBonus',label:'管理员加分'},
+        {key:'volunteer',label:'志愿者'},
+        {key:'goodDeed',label:'好人好事'},
+        {key:'uniformViolation',label:'军容不整'},
+        {key:'phoneViolation',label:'违规手机'},
+        {key:'computerViolation',label:'违规电脑'},
+        {key:'smokingViolation',label:'违规抽烟'},
+        {key:'nightAbsence',label:'夜不归宿'},
+        {key:'lateRise',label:'未及时起床'},
+        {key:'untimelyLeave',label:'未及时销假'}
+    ];
+
+    const elements = {
+        studentPageBtn: document.getElementById('studentPageBtn'),
+        schoolPageBtn: document.getElementById('schoolPageBtn'),
+        studentPage: document.getElementById('studentPage'),
+        schoolPage: document.getElementById('schoolPage'),
+        studentClassSelect: document.getElementById('studentClass'),
+        studentIdInput: document.getElementById('studentId'),
+        studentLoginBtn: document.getElementById('studentLoginBtn'),
+        studentInfoSection: document.getElementById('studentInfoSection'),
+        studentLogoutBtn: document.getElementById('studentLogoutBtn'),
+        displayName: document.getElementById('displayName'),
+        displayStudentId: document.getElementById('displayStudentId'),
+        displayClass: document.getElementById('displayClass'),
+        displayIdentity: document.getElementById('displayIdentity'),
+        todayTotalEl: document.getElementById('todayTotal'),
+        monthlyTotalEl: document.getElementById('monthlyTotal'),
+        totalScoreEl: document.getElementById('totalScore'),
+        studentScoreHeader: document.getElementById('studentScoreHeader'),
+        studentScoreBody: document.getElementById('studentScoreBody'),
+        adminUsernameInput: document.getElementById('adminUsername'),
+        adminPasswordInput: document.getElementById('adminPassword'),
+        adminLoginBtn: document.getElementById('adminLoginBtn'),
+        schoolManagementSection: document.getElementById('schoolManagementSection'),
+        adminLogoutBtn: document.getElementById('adminLogoutBtn'),
+        classListContainer: document.getElementById('classListContainer'),
+        addClassBtn: document.getElementById('addClassBtn'),
+        batchAddClassBtn: document.getElementById('batchAddClassBtn'),
+        editClassSelect: document.getElementById('editClass'),
+        editStudentIdInput: document.getElementById('editStudentId'),
+        editNameInput: document.getElementById('editName'),
+        editIdentitySelect: document.getElementById('editIdentity'),
+        saveStudentBtn: document.getElementById('saveStudentBtn'),
+        deleteStudentBtn: document.getElementById('deleteStudentBtn'),
+        addStudentBtn: document.getElementById('addStudentBtn'),
+        batchDeleteStudentsBtn: document.getElementById('batchDeleteStudentsBtn'),
+        notification: document.getElementById('notification'),
+        batchAddModal: document.getElementById('batchAddModal'),
+        batchClassNamesTextarea: document.getElementById('batchClassNames'),
+        closeBatchModal: document.getElementById('closeBatchModal'),
+        confirmBatchAdd: document.getElementById('confirmBatchAdd'),
+        cancelBatchAdd: document.getElementById('cancelBatchAdd'),
+        historyDateInput: document.getElementById('historyDateInput'),
+        queryHistoryBtn: document.getElementById('queryHistoryBtn'),
+        historyDetailTable: document.getElementById('historyDetailTable'),
+        historyMonthSelect: document.getElementById('historyMonthSelect'),
+        queryMonthTotalBtn: document.getElementById('queryMonthTotalBtn'),
+        monthTotalTable: document.getElementById('monthTotalTable'),
+        adminActionNotice: document.getElementById('adminActionNotice'),
+        onlineStudentsList: document.getElementById('onlineStudentsList'),
+        adminTodayTotal: document.getElementById('adminTodayTotal'),
+        adminScorePreviewBody: document.getElementById('adminScorePreviewBody'),
+        syncStatus: document.getElementById('syncStatus'),
+        dataStatus: document.getElementById('dataStatus')
+    };
+
+    // 辅助函数
+    function getToday() { 
+        return new Date().toISOString().slice(0,10); 
+    }
+    
+    function getCurrentMonth() { 
+        return new Date().toISOString().slice(0,7); 
+    }
+
+    function getDefaultDayScore() {
+        let obj = {};
+        SCORE_FIELDS.forEach(f => obj[f.key] = 0);
+        for(let k in AUTO_BASE) obj[k] = AUTO_BASE[k];
+        return obj;
+    }
+
+    function calcTotal(scores){
+        let add = 0, minus = 0;
+        const minusKeys = ['Violation','Absence','Rise','Leave'];
+        for(let k in scores){
+            minusKeys.some(x => k.includes(x)) ? minus += scores[k] : add += scores[k];
+        }
+        return add - minus;
+    }
+
+    // 月总分：没记录的天 = 自动5项满分（值班0）
+    function calcRealMonthTotal(student, month) {
+        const autoOneDay = 50; // 值班不加
+        let total = 0;
+        const today = getToday();
+
+        for(let date in student.dailyRecords){
+            if(date.startsWith(month)){
+                total += calcTotal(student.dailyRecords[date]);
+            }
+        }
+
+        const year = parseInt(month.slice(0,4));
+        const monthNum = parseInt(month.slice(5,7));
+        const firstDay = new Date(year, monthNum-1, 1);
+        const lastDay = new Date(year, monthNum, 0);
+
+        let cur = new Date(firstDay);
+        while(cur <= lastDay){
+            const d = cur.toISOString().slice(0,10);
+            if(d > today) break;
+            if(!student.dailyRecords[d]) total += autoOneDay;
+            cur.setDate(cur.getDate()+1);
+        }
+        return total;
+    }
+
+    // 云端API函数
+    async function loadDataFromCloud() {
+        try {
+            elements.syncStatus.textContent = '正在同步...';
+            elements.syncStatus.classList.add('syncing');
+            
+            const response = await fetch(`${API_BASE_URL}/data`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            if (data.classes) {
+                schoolData.classes = data.classes;
+                updateSyncStatus(true);
+                updateDataStatus();
+                retryCount = 0;
+                return true;
+            }
+        } catch (error) {
+            console.log('从云端加载数据失败:', error.message);
+            updateSyncStatus(false);
+            retryCount++;
+            return false;
+        }
+    }
+
+    async function saveDataToCloud() {
+        try {
+            elements.syncStatus.textContent = '正在保存...';
+            elements.syncStatus.classList.add('syncing');
+            
+            const response = await fetch(`${API_BASE_URL}/data`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Request-ID': Date.now()
+                },
+                body: JSON.stringify(schoolData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            if (result.success) {
+                updateSyncStatus(true);
+                updateDataStatus();
+                retryCount = 0;
+                lastSyncTime = new Date();
+                return true;
+            }
+        } catch (error) {
+            console.log('保存到云端失败:', error.message);
+            updateSyncStatus(false);
+            retryCount++;
+            return false;
+        }
+    }
+
+    // 修改后的 loadData 函数
+    async function loadData() {
+        const cloudSuccess = await loadDataFromCloud();
+        
+        if (!cloudSuccess) {
+            console.log('云端连接失败，尝试从本地加载');
+            const d = localStorage.getItem(STORAGE_KEY);
+            if (d) {
+                try {
+                    schoolData = JSON.parse(d);
+                } catch (e) {
+                    console.log('本地数据损坏，使用默认数据');
+                    initDefault();
+                }
+            } else {
+                initDefault();
+            }
+        }
+        
+        // 初始化数据结构
+        schoolData.classes.forEach(cls => {
+            cls.students.forEach(stu => {
+                if(!stu.dailyRecords) stu.dailyRecords = {};
+                if(!stu.monthlyTotalRecords) stu.monthlyTotalRecords = {};
+            });
+        });
+    }
+
+    // 修改后的 saveData 函数
+    async function saveData() {
+        const cloudSuccess = await saveDataToCloud();
+        
+        if (cloudSuccess) {
+            // 云端保存成功后，也保存到本地作为备份
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(schoolData));
+            showNotification("数据保存成功", "success");
+            return true;
+        } else {
+            // 云端失败，只保存到本地
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(schoolData));
+            showNotification("已保存到本地（离线模式）", "info");
+            return false;
+        }
+    }
+
+    function updateSyncStatus(online) {
+        isOnline = online;
+        setTimeout(() => {
+            if (online) {
+                elements.syncStatus.textContent = '已连接云端';
+                elements.syncStatus.classList.remove('offline', 'syncing');
+            } else {
+                elements.syncStatus.textContent = '离线模式';
+                elements.syncStatus.classList.remove('syncing');
+                elements.syncStatus.classList.add('offline');
+            }
+        }, 500);
+    }
+
+    function updateDataStatus() {
+        const studentCount = schoolData.classes.reduce((total, cls) => total + cls.students.length, 0);
+        const classCount = schoolData.classes.length;
+        elements.dataStatus.textContent = `${classCount}个班级 ${studentCount}名学生`;
+    }
+
+    function initDefault(){
+        schoolData = {
+            classes: [{
+                id: 1, 
+                name: "计算机1班",
+                students: [{
+                    id: "001", 
+                    name: "测试学生", 
+                    identity: "学生", 
+                    dailyRecords: {},
+                    monthlyTotalRecords: {}
+                }]
+            }]
+        };
+    }
+
+    async function autoRefreshDaily() {
+        const today = getToday();
+        const last = localStorage.getItem(LAST_RUN_DATE);
+        if(last === today) return;
+
+        let needsSave = false;
+        schoolData.classes.forEach(cls => {
+            cls.students.forEach(stu => {
+                if(!stu.dailyRecords[today]) {
+                    stu.dailyRecords[today] = getDefaultDayScore();
+                    needsSave = true;
+                }
+                const month = getCurrentMonth();
+                stu.monthlyTotalRecords[month] = calcRealMonthTotal(stu, month);
+            });
+        });
+        
+        if (needsSave) {
+            await saveData();
+            localStorage.setItem(LAST_RUN_DATE, today);
+        }
+    }
+
+    // 定期同步数据
+    function startAutoSync() {
+        if (syncTimer) clearInterval(syncTimer);
+        syncTimer = setInterval(async () => {
+            if (currentState.adminLoggedIn || currentState.studentLoggedIn) {
+                await loadDataFromCloud();
+                if (currentState.studentLoggedIn) {
+                    refreshStudent();
+                }
+                if (currentState.adminLoggedIn) {
+                    renderClassList();
+                }
+            }
+        }, SYNC_INTERVAL);
+    }
+
+    function showNotification(msg, type = "info"){
+        elements.notification.textContent = msg;
+        elements.notification.className = `notification ${type} show`;
+        setTimeout(() => elements.notification.classList.remove("show"), 2800);
+    }
+
+    function renderClassList(){
+        const container = elements.classListContainer;
+        container.innerHTML = '';
+        
+        schoolData.classes.forEach(cls => {
+            const div = document.createElement('div');
+            div.className = 'class-item';
+            div.innerHTML = `
+                <div>${cls.name}（${cls.students.length}人）</div>
+                <button class="del-class-btn" data-id="${cls.id}">删除</button>
+            `;
+            container.appendChild(div);
+            
+            // 添加点击事件
+            div.onclick = () => {
+                document.querySelectorAll('.class-item').forEach(item => 
+                    item.classList.remove('active'));
+                div.classList.add('active');
+                elements.editClassSelect.value = cls.id;
+                loadAdminStudentScore();
+            };
+        });
+        
+        // 删除按钮事件
+        document.querySelectorAll('.del-class-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                if(!currentState.adminLoggedIn) {
+                    return showNotification("请先登录管理员", "error");
+                }
+                const id = +btn.dataset.id;
+                const cls = schoolData.classes.find(x => x.id === id);
+                if(!confirm(`确定删除【${cls.name}】？此操作不可恢复！`)) return;
+                
+                schoolData.classes = schoolData.classes.filter(x => x.id !== id);
+                await saveData();
+                renderClassList();
+                initAllSelect();
+                showNotification("班级已删除", "success");
+            };
+        });
+    }
+
+    function initAllSelect(){
+        // 学生查询页面班级选择
+        elements.studentClassSelect.innerHTML = '<option value="">-- 选择班级 --</option>';
+        schoolData.classes.forEach(c => {
+            const o = document.createElement('option');
+            o.value = c.id;
+            o.textContent = c.name;
+            elements.studentClassSelect.appendChild(o);
+        });
+        
+        // 管理页面班级选择
+        elements.editClassSelect.innerHTML = '<option value="">-- 选择班级 --</option>';
+        schoolData.classes.forEach(c => {
+            const o = document.createElement('option');
+            o.value = c.id;
+            o.textContent = c.name;
+            elements.editClassSelect.appendChild(o);
+        });
+    }
+
+    function initMonthSelect(){
+        const select = elements.historyMonthSelect;
+        select.innerHTML = '<option value="">-- 选择月份 --</option>';
+        const stu = currentState.currentStudent;
+        if(!stu) return;
+        
+        const months = Object.keys(stu.monthlyTotalRecords).sort().reverse();
+        months.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m;
+            select.appendChild(opt);
+        });
+    }
+
+    function loadAdminStudentScore() {
+        const cid = +elements.editClassSelect.value;
+        const sid = elements.editStudentIdInput.value.trim();
+        
+        if(!cid || !sid) { 
+            clearAdminPreview(); 
+            return; 
+        }
+        
+        const cls = schoolData.classes.find(c => c.id === cid);
+        const stu = cls?.students.find(s => s.id === sid);
+        
+        if(!stu) { 
+            clearAdminPreview(); 
+            return; 
+        }
+        
+        elements.editNameInput.value = stu.name;
+        elements.editIdentitySelect.value = stu.identity;
+        const todayScore = stu.dailyRecords[getToday()] || getDefaultDayScore();
+        
+        SCORE_FIELDS.forEach(f => {
+            const input = document.getElementById(`edit${f.key.charAt(0).toUpperCase()}${f.key.slice(1)}`);
+            if(input) input.value = todayScore[f.key] || 0;
+        });
+        
+        renderPreview(todayScore);
+    }
+
+    function clearAdminPreview(){
+        elements.adminTodayTotal.textContent = "0";
+        elements.adminScorePreviewBody.innerHTML = "";
+        elements.editNameInput.value = "";
+        elements.editIdentitySelect.value = "学生";
+        
+        SCORE_FIELDS.forEach(f => {
+            const input = document.getElementById(`edit${f.key.charAt(0).toUpperCase()}${f.key.slice(1)}`);
+            if(input) input.value = AUTO_BASE[f.key] || 0;
+        });
+    }
+
+    function renderPreview(data){
+        elements.adminTodayTotal.textContent = calcTotal(data);
+        const body = elements.adminScorePreviewBody;
+        body.innerHTML = '';
+        
+        SCORE_FIELDS.forEach(f => {
+            const value = data[f.key] || 0;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${f.label}</td>
+                <td class="${value >= 0 ? 'positive-score' : 'negative-score'}">${value}</td>
+            `;
+            body.appendChild(row);
+        });
+    }
+
+    async function studentLogin(){
+        const cid = +elements.studentClassSelect.value;
+        const sid = elements.studentIdInput.value.trim();
+        
+        if(!cid || !sid) {
+            return showNotification("请选择班级并输入学号", "error");
+        }
+        
+        const cls = schoolData.classes.find(c => c.id === cid);
+        if(!cls) return;
+        
+        const stu = cls.students.find(s => s.id === sid);
+        if(!stu) return showNotification("学号不存在", "error");
+        
+        currentState.studentLoggedIn = true;
+        currentState.currentStudent = stu;
+        currentState.currentStudentClass = cls;
+        
+        if(!onlineStudents.includes(sid)) onlineStudents.push(sid);
+        updateOnline();
+        renderStudent();
+        initMonthSelect();
+        showNotification("登录成功", "success");
+        
+        // 开始同步
+        startAutoSync();
+    }
+
+    function renderStudent(){
+        const stu = currentState.currentStudent;
+        const cls = currentState.currentStudentClass;
+        
+        elements.displayName.textContent = stu.name;
+        elements.displayStudentId.textContent = stu.id;
+        elements.displayClass.textContent = cls.name;
+        elements.displayIdentity.innerHTML = 
+            `<span class="identity-badge ${IDENTITY_TYPES[stu.identity]}">${stu.identity}</span>`;
+        
+        const today = getToday();
+        const todayData = stu.dailyRecords[today] || getDefaultDayScore();
+        elements.todayTotalEl.textContent = calcTotal(todayData);
+        
+        const month = getCurrentMonth();
+        const monthTotal = calcRealMonthTotal(stu, month);
+        stu.monthlyTotalRecords[month] = monthTotal;
+        elements.monthlyTotalEl.textContent = monthTotal;
+        
+        let total = 0;
+        for(let m in stu.monthlyTotalRecords) {
+            total += stu.monthlyTotalRecords[m];
+        }
+        elements.totalScoreEl.textContent = total;
+        
+        renderTodayTable(todayData);
+        elements.studentInfoSection.classList.remove("hidden");
+    }
+
+    function renderTodayTable(data){
+        const header = elements.studentScoreHeader;
+        const body = elements.studentScoreBody;
+        
+        header.innerHTML = '<tr><th>项目</th><th>分数</th></tr>';
+        body.innerHTML = '';
+        
+        SCORE_FIELDS.forEach(f => {
+            const value = data[f.key] || 0;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${f.label}</td>
+                <td class="${value >= 0 ? 'positive-score' : 'negative-score'}">${value}</td>
+            `;
+            body.appendChild(row);
+        });
+    }
+
+    function queryHistory(){
+        const date = elements.historyDateInput.value;
+        const stu = currentState.currentStudent;
+        
+        if(!stu || !date) return;
+        
+        const data = stu.dailyRecords[date] || getDefaultDayScore();
+        const thead = elements.historyDetailTable.querySelector('thead');
+        const tbody = elements.historyDetailTable.querySelector('tbody');
+        
+        thead.innerHTML = `<tr><th colspan="2">${date} 总分：${calcTotal(data)}</th></tr>`;
+        tbody.innerHTML = '';
+        
+        SCORE_FIELDS.forEach(f => {
+            const value = data[f.key] || 0;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${f.label}</td>
+                    <td class="${value >= 0 ? 'positive-score' : 'negative-score'}">${value}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function queryMonthTotal(){
+        const month = elements.historyMonthSelect.value;
+        const stu = currentState.currentStudent;
+        
+        if(!stu || !month) return;
+        
+        const total = calcRealMonthTotal(stu, month);
+        const tbody = elements.monthTotalTable.querySelector('tbody');
+        tbody.innerHTML = `<tr><td>${month}</td><td>${total}</td></tr>`;
+    }
+
+    async function saveStudent(){
+        const cid = +elements.editClassSelect.value;
+        const sid = elements.editStudentIdInput.value.trim();
+        const name = elements.editNameInput.value.trim();
+        
+        if(!cid || !sid || !name) {
+            return showNotification("请填写完整信息（班级、学号、姓名）", "error");
+        }
+        
+        const cls = schoolData.classes.find(c => c.id === cid);
+        if(!cls) return;
+        
+        const scoreData = getDefaultDayScore();
+        SCORE_FIELDS.forEach(f => {
+            const input = document.getElementById(`edit${f.key.charAt(0).toUpperCase()}${f.key.slice(1)}`);
+            if(input) scoreData[f.key] = +input.value || 0;
+        });
+        
+        const today = getToday();
+        const month = getCurrentMonth();
+        
+        let stu = cls.students.find(s => s.id === sid);
+        if(stu) {
+            // 更新现有学生
+            stu.name = name;
+            stu.identity = elements.editIdentitySelect.value;
+            stu.dailyRecords[today] = scoreData;
+        } else {
+            // 添加新学生
+            cls.students.push({
+                id: sid,
+                name: name,
+                identity: elements.editIdentitySelect.value,
+                dailyRecords: { [today]: scoreData },
+                monthlyTotalRecords: {}
+            });
+            stu = cls.students.find(s => s.id === sid);
+        }
+        
+        stu.monthlyTotalRecords[month] = calcRealMonthTotal(stu, month);
+        
+        const success = await saveData();
+        if(success) {
+            renderClassList();
+            initAllSelect();
+            refreshStudent();
+            updateOnline();
+            loadAdminStudentScore();
+        }
+    }
+
+    async function deleteStudent(){
+        const cid = +elements.editClassSelect.value;
+        const sid = elements.editStudentIdInput.value.trim();
+        
+        if(!cid || !sid) {
+            return showNotification("请选择班级并输入学号", "error");
+        }
+        
+        const cls = schoolData.classes.find(c => c.id === cid);
+        if(!cls) return;
+        
+        const stu = cls.students.find(s => s.id === sid);
+        if(!stu) return;
+        
+        if(!confirm(`确定删除学生 ${stu.name}（${stu.id}）？此操作不可恢复！`)) return;
+        
+        cls.students = cls.students.filter(s => s.id !== sid);
+        
+        const success = await saveData();
+        if(success) {
+            renderClassList();
+            initAllSelect();
+            clearAdminPreview();
+            refreshStudent();
+            updateOnline();
+        }
+    }
+
+    function refreshStudent(){
+        if(currentState.studentLoggedIn && currentState.currentStudent){
+            renderStudent();
+            elements.adminActionNotice.classList.remove('hidden');
+            setTimeout(() => elements.adminActionNotice.classList.add('hidden'), 5000);
+        }
+    }
+
+    function updateOnline(){
+        const list = elements.onlineStudentsList;
+        list.innerHTML = '';
+        
+        onlineStudents.forEach(sid => {
+            let name = sid;
+            for(const cls of schoolData.classes){
+                const stu = cls.students.find(s => s.id === sid);
+                if(stu){
+                    name = stu.name;
+                    break;
+                }
+            }
+            const li = document.createElement('li');
+            li.textContent = `${name}（${sid}）`;
+            list.appendChild(li);
+        });
+    }
+
+    // 绑定事件
+    function bind(){
+        elements.studentLoginBtn.onclick = studentLogin;
+        
+        elements.studentLogoutBtn.onclick = () => {
+            if(currentState.currentStudent) {
+                onlineStudents = onlineStudents.filter(id => id !== currentState.currentStudent.id);
+            }
+            currentState = {
+                ...currentState,
+                studentLoggedIn: false,
+                currentStudent: null
+            };
+            elements.studentInfoSection.classList.add("hidden");
+            updateOnline();
+        };
+        
+        elements.queryHistoryBtn.onclick = queryHistory;
+        elements.queryMonthTotalBtn.onclick = queryMonthTotal;
+        
+        elements.editClassSelect.onchange = loadAdminStudentScore;
+        elements.editStudentIdInput.oninput = loadAdminStudentScore;
+        
+        elements.adminLoginBtn.onclick = () => {
+            if(elements.adminUsernameInput.value === "admin" && 
+               elements.adminPasswordInput.value === "admin123"){
+                currentState.adminLoggedIn = true;
+                elements.schoolManagementSection.classList.remove("hidden");
+                renderClassList();
+                initAllSelect();
+                updateOnline();
+                startAutoSync();
+                showNotification("管理员登录成功", "success");
+            } else {
+                showNotification("账号密码错误", "error");
+            }
+        };
+        
+        elements.adminLogoutBtn.onclick = () => {
+            currentState.adminLoggedIn = false;
+            elements.schoolManagementSection.classList.add("hidden");
+        };
+        
+        elements.saveStudentBtn.onclick = saveStudent;
+        elements.deleteStudentBtn.onclick = deleteStudent;
+        
+        elements.addClassBtn.onclick = async () => {
+            const className = prompt("请输入班级名称：");
+            if(!className) return;
+            
+            const newId = schoolData.classes.length > 0 
+                ? Math.max(...schoolData.classes.map(x => x.id)) + 1 
+                : 1;
+            
+            schoolData.classes.push({
+                id: newId,
+                name: className,
+                students: []
+            });
+            
+            await saveData();
+            renderClassList();
+            initAllSelect();
+        };
+        
+        elements.batchAddClassBtn.onclick = () => {
+            elements.batchAddModal.classList.add("show");
+        };
+        
+        elements.closeBatchModal.onclick = elements.cancelBatchAdd.onclick = () => {
+            elements.batchAddModal.classList.remove("show");
+        };
+        
+        elements.confirmBatchAdd.onclick = async () => {
+            const classNames = elements.batchClassNamesTextarea.value
+                .trim()
+                .split("\n")
+                .filter(name => name.trim());
+            
+            if(classNames.length === 0) {
+                return showNotification("请输入至少一个班级名称", "error");
+            }
+            
+            let nextId = schoolData.classes.length > 0 
+                ? Math.max(...schoolData.classes.map(x => x.id)) + 1 
+                : 1;
+            
+            classNames.forEach(name => {
+                schoolData.classes.push({
+                    id: nextId++,
+                    name: name.trim(),
+                    students: []
+                });
+            });
+            
+            await saveData();
+            renderClassList();
+            initAllSelect();
+            elements.batchAddModal.classList.remove("show");
+            showNotification(`成功导入 ${classNames.length} 个班级`, "success");
+        };
+        
+        elements.studentPageBtn.onclick = () => {
+            elements.studentPage.classList.add("active");
+            elements.schoolPage.classList.remove("active");
+            elements.studentPageBtn.classList.add("active");
+            elements.schoolPageBtn.classList.remove("active");
+        };
+        
+        elements.schoolPageBtn.onclick = () => {
+            elements.schoolPage.classList.add("active");
+            elements.studentPage.classList.remove("active");
+            elements.schoolPageBtn.classList.add("active");
+            elements.studentPageBtn.classList.remove("active");
+        };
+    }
+
+    async function init(){
+        try {
+            await loadData();
+            await autoRefreshDaily();
+            initAllSelect();
+            bind();
+            startAutoSync();
+            updateDataStatus();
+        } catch (error) {
+            console.error('初始化失败:', error);
+            showNotification("系统初始化失败，请刷新页面", "error");
+        }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
